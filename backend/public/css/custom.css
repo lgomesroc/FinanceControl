@@ -1,0 +1,33 @@
+body {
+    background-color: #f0f0f0; /* Alterar o fundo da página */
+    color: #333; /* Cor do texto */
+    font-family: 'Arial', sans-serif; /* Fonte padrão */
+}
+
+.container {
+    background-color: #fff; /* Fundo branco para o conteúdo */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+}
+
+.btn {
+    border-radius: 5px;
+    padding: 10px 20px;
+    margin: 5px;
+}
+
+.alert {
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 10px 0;
+}
