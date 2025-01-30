@@ -1,0 +1,19 @@
+Fizemos o clone do reppsitório e queremos instalar os conteineres, devemos verificar alguns comandos no linux:
+
+- se o apache estiver sendo executado na inicialização do SO, digite esse comando para desativar: sudo systemctl disable apache2 && sudo systemctl stop apache2
+
+- se o docker estiver sendo executado na inicialização do SO, digite esse comando para desativar: sudo systemctl disable docker
+
+- se quiser verificar o status do docker, digite: sudo systemctl status docker
+
+- se quiser verificar quais processos estão executando uma porta, por exemplo a porta 3307, digite: sudo lsof -i :3307
+
+- se quiser matar o processo com o UID, por exemplo o 6336, digite: sudo kill -9 <PID> - lembre-se que só dá para matar um UID de cada vez.
+
+- para construir e executar o conteiner, digite: docker-compose up --build -d
+
+- verificar os conteineres em execução, digite: docker ps
+
+- entrar no conteiner, digite: docker exec -it laravel-app /bin/bash
+
+- dentro do conteiner, digitar esse comando: php artisan serve --host=0.0.0.0 --port=8080

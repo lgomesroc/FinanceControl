@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\AlertController;
@@ -18,9 +17,13 @@ Route::get('/goals', [GoalController::class, 'index']);
 Route::post('/goals', [GoalController::class, 'store']);
 Route::get('/incomes', [IncomeController::class, 'index']);
 Route::post('/incomes', [IncomeController::class, 'store']);
-Route::resource('expenses', ExpenseController::class);
-Route::resource('goals', GoalController::class);
-Route::resource('users', UserController::class);
-Route::resource('alerts', AlertController::class);
-Route::resource('incomes', IncomeController::class);
+Route::apiResource('expenses', ExpenseController::class);
+Route::apiResource('goals', GoalController::class);
+Route::apiResource('users', UserController::class);
+Route::apiResource('alerts', AlertController::class);
+Route::apiResource('incomes', IncomeController::class);
 
+// Rota da API para gerar o token CSRF
+Route::get('/generate-token', function () {
+    return csrf_token();
+});
