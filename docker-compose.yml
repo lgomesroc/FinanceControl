@@ -4,7 +4,6 @@ services:
     app:
         build:
             context: .
-        image: laravel-app
         container_name: laravel-app
         working_dir: /var/www/backend
         volumes:
