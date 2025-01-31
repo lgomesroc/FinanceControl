@@ -28,7 +28,7 @@ FinanceControl é um sistema de controle financeiro pessoal desenvolvido para aj
 
 1. Clone o repositório:
    ```bash
-   git clone https://github.com/seu-usuario/FinanceControl.git
+   git clone https://github.com/lgomesroc/FinanceControl.git
    cd FinanceControl
    ```
 
@@ -58,6 +58,11 @@ FinanceControl é um sistema de controle financeiro pessoal desenvolvido para aj
 6. Execute as migrações para criar as tabelas no banco de dados:
    ```bash
    php artisan migrate
+   ```
+
+7. Execute o comando abaixo lembrando que está na porta 8000
+   ```bash
+   php artisan serve --host=0.0.0.0 --port=8000
    ```
 
 ## Uso

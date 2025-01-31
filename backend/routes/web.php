@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Providers;
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IncomeController;
@@ -30,4 +32,4 @@ Route::resource('alerts', AlertController::class);
 // Rota para gerar o token CSRF
 Route::get('/generate-token', function () {
     return csrf_token();
-});
+})->middleware('disable_csrf');
