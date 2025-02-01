@@ -11,7 +11,7 @@ class UserController extends Controller
     // Lista todos os usuários
     public function index(Request $request)
     {
-        $users = User::select('name', 'email')->get();
+        $users = User::select('name', 'email', 'id')->get();
 
         // API: retorna JSON
         if ($request->is('api/users')) {
@@ -49,15 +49,17 @@ class UserController extends Controller
                 'password' => bcrypt($validated['password']),
             ]);
             if ($request->is('api/users')) {
-                return response()->json([
-                    'user' => $user,
-                    'message' => 'Usuário cadastrado com sucesso!'],
-                    201);
+                return response()->json(
+                    [
+                        'user' => $user,
+                        'message' => 'Usuário cadastrado com sucesso!'
+                    ],
+                    201
+                );
             }
 
             // Web: redireciona para a lista de usuários
             return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso!');
-
         } catch (Throwable $exception) {
 
             return response()->json(['error' => $exception->getMessage()], 500);
