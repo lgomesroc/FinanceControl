@@ -8,6 +8,8 @@ services:
         working_dir: /var/www/backend
         volumes:
             - .:/var/www
+            - ./backend/storage:/var/www/backend/storage
+            - ./backend/bootstrap/cache:/var/www/backend/bootstrap/cache
         networks:
             - laravel-network
         depends_on:
@@ -24,7 +26,7 @@ services:
             MYSQL_USER: lgomesroc
             MYSQL_PASSWORD: 12345
         ports:
-            - "3308:3306"
+            - "3306:3306"
         networks:
             - laravel-network
 

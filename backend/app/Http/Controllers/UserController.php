@@ -4,17 +4,18 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Throwable;
 
 class UserController extends Controller
 {
     // Lista todos os usuários
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
+        $users = User::select('name', 'email')->get();
 
         // API: retorna JSON
-        if (request()->wantsJson()) {
-            return response()->json($users);
+        if ($request->is('api/users')) {
+            return response()->json([$users], 200);
         }
 
         // Web: retorna view
@@ -27,45 +28,59 @@ class UserController extends Controller
         return view('users.create');
     }
 
-    // Cria um novo usuário
+    /** Cria um novo usuário **/
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|max:255',
-            'password' => 'required|string|min:8|confirmed',
-        ]);
+        try {
+            // Definir regras de validação
+            $rules = [
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email|max:255',
+                'password' => 'required|string|min:8' . ($request->path() !== 'api/users/' ? '' : '|confirmed'),
+            ];
 
-        $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => bcrypt($validated['password']),
-        ]);
+            // Validar a solicitação
+            $validated = $request->validate($rules);
 
-        // API: retorna o usuário criado
-        if ($request->wantsJson()) {
-            return response()->json($user, 201);
+            // Criar o usuário
+            $user = User::create([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => bcrypt($validated['password']),
+            ]);
+            if ($request->is('api/users')) {
+                return response()->json([
+                    'user' => $user,
+                    'message' => 'Usuário cadastrado com sucesso!'],
+                    201);
+            }
+
+            // Web: redireciona para a lista de usuários
+            return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso!');
+
+        } catch (Throwable $exception) {
+
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
-
-        // Web: redireciona para a lista de usuários
-        return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso!');
     }
 
-    // Exibe os detalhes de um usuário específico
+    /** Exibe os detalhes de um usuário específico **/
     public function show(User $user)
     {
         return view('users.show', compact('user'));
     }
 
-    // Exibe o formulário para editar um usuário
+    /** Exibe o formulário para editar um usuário **/
     public function edit(User $user)
     {
         return view('users.edit', compact('user'));
     }
 
-    // Atualiza os dados de um usuário específico
+    /** Atualiza os dados de um usuário específico via web **/
     public function update(Request $request, User $user)
     {
+        $user = User::findOrFail($user->id);
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id . '|max:255',
@@ -87,16 +102,42 @@ class UserController extends Controller
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso!');
     }
 
-    // Exclui um usuário específico
-    public function destroy(User $user)
+    /** Atualiza os dados de um usuário específico rota via api **/
+    public function updateApi(Request $request, User $user)
     {
-        $user->delete();
+        try {
 
-        // API: retorna status de sucesso
-        if (request()->wantsJson()) {
-            return response()->json(null, 204);
+            $user = User::findOrFail($request->id);
+
+            $validated = $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|max:255',
+                'password' => 'nullable|string|min:8',
+            ]);
+
+            $user->update([
+                'name' => $validated['name'],
+                'email' => $validated['email'],
+                'password' => $validated['password'] ? bcrypt($validated['password']) : $user->password,
+            ]);
+            return response()->json([
+                'message' => 'Usuário atualizados com sucesso!',
+                'user' => $user
+            ], 201);
+        } catch (Throwable $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
+    }
 
+    // Exclui um usuário específico
+    public function destroy(User $user, Request $request)
+    {
+        if ($request->is("api/users/$request->id")) {
+            $user = User::findOrFail($request->id);
+            $user->delete();
+            return response()->json(['message' => 'Usuário excluído com sucesso!'], 204);
+        }
+        $user->delete();
         // Web: redireciona para a lista de usuários
         return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso!');
     }

@@ -8,6 +8,7 @@ RUN apt-get update && apt-get install -y \
     libfreetype6-dev \
     zip \
     git \
+    default-mysql-client \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install gd pdo pdo_mysql \
     && apt-get clean
@@ -19,13 +20,17 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 WORKDIR /var/www/backend
 
 # Copiar os arquivos composer.json e composer.lock para instalar as dependências
-COPY backend/composer.json composer.lock ./
+COPY backend/composer.json backend/composer.lock ./
 
 # Instalar as dependências do Laravel
 RUN composer install --no-scripts --no-autoloader
 
 # Copiar o código da aplicação para dentro do container
 COPY backend/ /var/www/backend/
+
+# Ajustar permissões dos diretórios de armazenamento e cache
+RUN chown -R www-data:www-data /var/www/backend/storage /var/www/backend/bootstrap/cache \
+    && chmod -R 775 /var/www/backend/storage /var/www/backend/bootstrap/cache
 
 # Gerar o autoloader otimizado do Composer
 RUN composer dump-autoload --optimize
