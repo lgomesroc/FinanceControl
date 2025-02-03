@@ -11,7 +11,7 @@ class UserController extends Controller
     // Lista todos os usuários
     public function index(Request $request)
     {
-        $users = User::select('name', 'email')->get();
+        $users = User::select('id', 'name', 'email', 'created_at')->get();
 
         // API: retorna JSON
         if ($request->is('api/users')) {

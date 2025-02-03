@@ -13,8 +13,8 @@
         @foreach($users as $user)
             <li>
                 <strong>{{ $user->name }}</strong> - {{ $user->email }}
-                <a href="{{ route('users.edit', $user) }}" class="btn btn-warning">Editar</a>
-                <form action="{{ route('users.destroy', $user) }}" method="POST" style="display:inline;">
+                <a href="{{ url("/users/{$user->id}/edit") }}" class="btn btn-warning">Editar</a>
+                <form action="{{ url("/users/{$user->id}") }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Excluir</button>

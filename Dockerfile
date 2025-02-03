@@ -19,8 +19,8 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 # Definir o diretório de trabalho no container
 WORKDIR /var/www/backend
 
-# Copiar os arquivos composer.json e composer.lock para instalar as dependências
-COPY backend/composer.json backend/composer.lock ./
+# Copiar os arquivos composer.json e instalar as dependências
+COPY backend/composer.json ./
 
 # Instalar as dependências do Laravel
 RUN composer install --no-scripts --no-autoloader
