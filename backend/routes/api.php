@@ -9,8 +9,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/users', [UserController::class, 'index']);
 Route::post('/users', [UserController::class, 'store'])->name('api.users.store');
-Route::put('/users/{id}', [UserController::class, 'updateApi'])->name('api.users.update');
-Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('api.users.destroy');
+Route::put('/users/{user}', [UserController::class, 'updateApi'])->name('api.users.update');
+Route::delete('/users/{user}', [UserController::class, 'destroy'])->name('api.users.destroy');
 Route::get('/alerts', [AlertController::class, 'index']);
 Route::post('/alerts', [AlertController::class, 'store']);
 Route::get('/expenses', [ExpenseController::class, 'index']);
