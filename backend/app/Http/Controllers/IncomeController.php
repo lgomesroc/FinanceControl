@@ -2,19 +2,32 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\IncomeStoreRequest;
+use App\Http\Requests\IncomeUpdateApiRequest;
+use App\Http\Requests\IncomeUpdateRequest;
+use App\Http\Resources\IncomeResource;
+use App\Services\IncomeService;
 use Illuminate\Http\Request;
 use App\Models\Income;
+use Throwable;
 
 class IncomeController extends Controller
 {
-    // Lista todas as receitas
-    public function index()
+    protected $incomeService;
+
+    public function __construct(IncomeService $incomeService)
     {
-        $incomes = Income::all();
+        $this->incomeService = $incomeService;
+    }
+
+    /** Lista todas as receitas **/
+    public function index(Request $request)
+    {
+        $incomes = Income::select('id', 'amount', 'source', 'created_at')->get();
 
         // API: retorna JSON
-        if (request()->wantsJson()) {
-            return response()->json($incomes);
+        if ($request->is('api/incomes')) {
+            return IncomeResource::collection($incomes);
         }
 
         // Web: retorna view
@@ -27,69 +40,74 @@ class IncomeController extends Controller
         return view('incomes.create');
     }
 
-    // Salva uma nova receita
-    public function store(Request $request)
+    /** Cria uma nova receita **/
+    public function store(IncomeStoreRequest $request)
     {
-        $validated = $request->validate([
-            'description' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
-            'date' => 'required|date',
-        ]);
+        try {
+            $income = $this->incomeService.create($request->validated());
 
-        $income = Income::create($validated);
+            if ($request->is('api/incomes')) {
+                return (new IncomeResource($income))
+                    ->additional(['message' => 'Receita cadastrada com sucesso!'])
+                    ->response()
+                    ->setStatusCode(201);
+            }
 
-        // API: retorna a receita criada
-        if ($request->wantsJson()) {
-            return response()->json($income, 201);
+            return redirect()->route('incomes.index')->with('success', 'Receita criada com sucesso!');
+
+        } catch (Throwable $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
-
-        // Web: redireciona para a lista de receitas
-        return redirect()->route('incomes.index')->with('success', 'Receita criada com sucesso!');
     }
 
-    // Exibe os detalhes de uma receita específica
+    /** Exibe os detalhes de uma receita específica **/
     public function show(Income $income)
     {
         return view('incomes.show', compact('income'));
     }
 
-    // Exibe o formulário para editar uma receita
+    /** Exibe o formulário para editar uma receita **/
     public function edit(Income $income)
     {
         return view('incomes.edit', compact('income'));
     }
 
-    // Atualiza os dados de uma receita específica
-    public function update(Request $request, Income $income)
+    /** Atualiza os dados de uma receita específica via web **/
+    public function update(IncomeUpdateRequest $request, Income $income)
     {
-        $validated = $request->validate([
-            'description' => 'required|string|max:255',
-            'amount' => 'required|numeric|min:0',
-            'date' => 'required|date',
-        ]);
-
-        $income->update($validated);
-
-        // API: retorna a receita atualizada
-        if ($request->wantsJson()) {
-            return response()->json($income);
-        }
-
+        $this->incomeService.update($income, $request->validated());
         // Web: redireciona para a lista de receitas
         return redirect()->route('incomes.index')->with('success', 'Receita atualizada com sucesso!');
     }
 
-    // Exclui uma receita específica
-    public function destroy(Income $income)
+    /** Atualiza os dados de uma receita específica via api **/
+    public function updateApi(IncomeUpdateApiRequest $request, Income $income)
     {
-        $income->delete();
-
-        // API: retorna status de sucesso
-        if (request()->wantsJson()) {
-            return response()->json(null, 204);
+        try {
+            $income = $this->incomeService.update($income, $request->validated());
+            // API: retorna a receita atualizada
+            return (new IncomeResource($income))
+                ->additional(['message' => 'Receita atualizada com sucesso!'])
+                ->response()
+                ->setStatusCode(200);
+        } catch (Throwable $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
+    }
 
-        // Web: redireciona para a lista de receitas
-        return redirect()->route('incomes.index')->with('success', 'Receita excluída com sucesso!');
+    /** Exclui uma receita específica */
+    public function destroy(Income $income, Request $request)
+    {
+        try {
+            $this->incomeService.delete($income);
+
+            if ($request->is("api/incomes/{$income->id}")) {
+                return response()->json(['message' => 'Receita excluída com sucesso!'], 204);
+            }
+
+            return redirect()->route('incomes.index')->with('success', 'Receita excluída com sucesso!');
+        } catch (Throwable $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
     }
 }
