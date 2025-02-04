@@ -20,10 +20,10 @@ class IncomeController extends Controller
         $this->incomeService = $incomeService;
     }
 
-    /** Lista todas as receitas **/
+    /** Lista todas as receitas */
     public function index(Request $request)
     {
-        $incomes = Income::select('id', 'amount', 'source', 'created_at')->get();
+        $incomes = Income::select('id', 'name', 'amount', 'date')->get();
 
         // API: retorna JSON
         if ($request->is('api/incomes')) {
@@ -40,7 +40,7 @@ class IncomeController extends Controller
         return view('incomes.create');
     }
 
-    /** Cria uma nova receita **/
+    /** Cria uma nova receita */
     public function store(IncomeStoreRequest $request)
     {
         try {
