@@ -1,52 +1,54 @@
 version: '3.8'
 
 services:
-    app:
-        build:
-            context: .
-        container_name: laravel-app
-        working_dir: /var/www/backend
-        volumes:
-            - .:/var/www
-            - ./backend/storage:/var/www/backend/storage
-            - ./backend/bootstrap/cache:/var/www/backend/bootstrap/cache
-        networks:
-            - laravel-network
-        depends_on:
-            - db
-        ports:
-            - "8000:8000"
+  app:
+    build:
+      context: .
+    container_name: laravel-app
+    working_dir: /var/www/backend
+    volumes:
+      - .:/var/www
+      - ./backend/storage:/var/www/backend/storage
+      - ./backend/bootstrap/cache:/var/www/backend/bootstrap/cache
+    networks:
+      - laravel-network
+    depends_on:
+      - db
+    ports:
+      - "8000:8000"
 
-    db:
-        image: mysql:8.0
-        container_name: mysql-db
-        environment:
-            MYSQL_ROOT_PASSWORD: 5577azcD@#
-            MYSQL_DATABASE: financecontrol_db
-            MYSQL_USER: lgomesroc
-            MYSQL_PASSWORD: 12345
-        ports:
-<<<<<<< HEAD
-            - "3307:3306"
-=======
-            - "3308:3306"
->>>>>>> origin/develop
-        networks:
-            - laravel-network
+  db:
+    image: mysql:8.0
+    container_name: mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 5577azcD@#
+      MYSQL_DATABASE: financecontrol_db
+      MYSQL_USER: lgomesroc
+      MYSQL_PASSWORD: 12345
+    ports:
+      - "3308:3306"
+    networks:
+      - laravel-network
+    volumes:
+      - mysql-data:/var/lib/mysql
 
-    nginx:
-        image: nginx:alpine
-        container_name: nginx-server
-        ports:
-            - "8080:80"
-        volumes:
-            - ./default.conf:/etc/nginx/conf.d/default.conf
-            - .:/var/www
-        depends_on:
-            - app
-        networks:
-            - laravel-network
+  nginx:
+    image: nginx:alpine
+    container_name: nginx-server
+    ports:
+      - "8080:80"
+    volumes:
+      - ./default.conf:/etc/nginx/conf.d/default.conf
+      - .:/var/www
+    depends_on:
+      - app
+    networks:
+      - laravel-network
 
 networks:
-    laravel-network:
-        driver: bridge
+  laravel-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    name: financecontrol_mysql_data

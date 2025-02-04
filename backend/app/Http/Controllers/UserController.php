@@ -20,14 +20,13 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
-    // Lista todos os usuários
+    /** Lista todos os usuários **/
     public function index(Request $request)
     {
-<<<<<<< HEAD
+
         $users = User::select('name', 'email', 'id')->get();
-=======
+
         $users = User::select('id', 'name', 'email', 'created_at')->get();
->>>>>>> origin/develop
 
         // API: retorna JSON
         if ($request->is('api/users')) {
