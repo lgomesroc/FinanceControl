@@ -14,7 +14,7 @@
             <li>
                 <strong>{{ $user->name }}</strong> - {{ $user->email }}
                 <a href="{{ url("users/$user->id/edit") }}" class="btn btn-warning">Editar</a>
-                <form action="{{ url("users./$user-id") }}" method="POST" style="display:inline;">
+                <form action="{{ url("users/$user->id") }}" method="POST" style="display:inline;">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Excluir</button>

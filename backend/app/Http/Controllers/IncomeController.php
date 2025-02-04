@@ -8,13 +8,13 @@ use App\Models\Income;
 class IncomeController extends Controller
 {
     // Lista todas as receitas
-    public function index()
+    public function index(Request $request)
     {
-        $incomes = Income::all();
+        $incomes = Income::select('name', 'amount', 'date', 'id')->get();
 
         // API: retorna JSON
-        if (request()->wantsJson()) {
-            return response()->json($incomes);
+        if (request->is('api/incomes')) {
+            return response()->json($incomes, 200);
         }
 
         // Web: retorna view
@@ -30,6 +30,21 @@ class IncomeController extends Controller
     // Salva uma nova receita
     public function store(Request $request)
     {
+        try{
+            $rules = [
+                'name' => 'required|string|mas:255',
+                'amount' => 'required|numeric',
+                'date' => 'required|date',
+            ];
+
+            $validated = $request->validate($rules);
+
+            $income = Income::create($validated);
+
+            if ($request->is('api/income')) {
+
+            }
+        };
         $validated = $request->validate([
             'description' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
