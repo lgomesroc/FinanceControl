@@ -2,20 +2,36 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UserStoreRequest;
+use App\Http\Requests\UserUpdateApiRequest;
+use App\Http\Requests\UserUpdateRequest;
+use App\Http\Resources\UserResource;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Throwable;
 
 class UserController extends Controller
 {
+    protected $userService;
+
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+
     // Lista todos os usuários
     public function index(Request $request)
     {
+<<<<<<< HEAD
         $users = User::select('name', 'email', 'id')->get();
+=======
+        $users = User::select('id', 'name', 'email', 'created_at')->get();
+>>>>>>> origin/develop
 
         // API: retorna JSON
         if ($request->is('api/users')) {
-            return response()->json([$users], 200);
+            return UserResource::collection($users);
         }
 
         // Web: retorna view
@@ -29,37 +45,23 @@ class UserController extends Controller
     }
 
     /** Cria um novo usuário **/
-    public function store(Request $request)
+    public function store(UserStoreRequest $request)
     {
         try {
-            // Definir regras de validação
-            $rules = [
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email|max:255',
-                'password' => 'required|string|min:8' . ($request->path() !== 'api/users/' ? '' : '|confirmed'),
-            ];
 
-            // Validar a solicitação
-            $validated = $request->validate($rules);
+            $user = $this->userService->create($request->validated());
 
-            // Criar o usuário
-            $user = User::create([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => bcrypt($validated['password']),
-            ]);
             if ($request->is('api/users')) {
-                return response()->json([
-                    'user' => $user,
-                    'message' => 'Usuário cadastrado com sucesso!'],
-                    201);
+
+                return (new UserResource($user))
+                    ->additional(['message' => 'Usuário cadastrado com sucesso!'])
+                    ->response()
+                    ->setStatusCode(201);
             }
 
-            // Web: redireciona para a lista de usuários
             return redirect()->route('users.index')->with('success', 'Usuário criado com sucesso!');
 
         } catch (Throwable $exception) {
-
             return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
@@ -77,68 +79,45 @@ class UserController extends Controller
     }
 
     /** Atualiza os dados de um usuário específico via web **/
-    public function update(Request $request, User $user)
+    public function update(UserUpdateRequest $request, User $user)
     {
-        $user = User::findOrFail($user->id);
-
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->id . '|max:255',
-            'password' => 'nullable|string|min:8|confirmed',
-        ]);
-
-        $user->update([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => $validated['password'] ? bcrypt($validated['password']) : $user->password,
-        ]);
-
-        // API: retorna o usuário atualizado
-        if ($request->wantsJson()) {
-            return response()->json($user);
-        }
-
+        $this->userService->update($user, $request->validated());
         // Web: redireciona para a lista de usuários
         return redirect()->route('users.index')->with('success', 'Usuário atualizado com sucesso!');
     }
 
     /** Atualiza os dados de um usuário específico rota via api **/
-    public function updateApi(Request $request, User $user)
+    public function updateApi(UserUpdateApiRequest $request, User $user)
     {
         try {
+            $user = $this->userService->update($user, $request->validated());
+            // API: retorna o usuário atualizado
+            return (new UserResource($user))
+                ->additional(['message' => 'Usuário atualizado com sucesso!'])
+                ->response()
+                ->setStatusCode(200);
 
-            $user = User::findOrFail($request->id);
-
-            $validated = $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|max:255',
-                'password' => 'nullable|string|min:8',
-            ]);
-
-            $user->update([
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'password' => $validated['password'] ? bcrypt($validated['password']) : $user->password,
-            ]);
-            return response()->json([
-                'message' => 'Usuário atualizados com sucesso!',
-                'user' => $user
-            ], 201);
         } catch (Throwable $exception) {
+
             return response()->json(['error' => $exception->getMessage()], 500);
         }
+
     }
 
     // Exclui um usuário específico
     public function destroy(User $user, Request $request)
     {
-        if ($request->is("api/users/$request->id")) {
-            $user = User::findOrFail($request->id);
-            $user->delete();
-            return response()->json(['message' => 'Usuário excluído com sucesso!'], 204);
+        try {
+
+            $this->userService->delete($user);
+
+            if ($request->is("api/users/{$user->id}")) {
+                return response()->json(['message' => 'Usuário excluído com sucesso!'], 204);
+            }
+
+            return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso!');
+        } catch (Throwable $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
-        $user->delete();
-        // Web: redireciona para a lista de usuários
-        return redirect()->route('users.index')->with('success', 'Usuário excluído com sucesso!');
     }
 }

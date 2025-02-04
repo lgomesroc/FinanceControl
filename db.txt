@@ -1,0 +1,5 @@
+entrar no contêiner do mysql na pasta FinanceControl2: docker exec -it mysql-db bash
+
+entrar no banco de dados: mysql -h db -u lgomesroc -p
+
+a senha: 12345

@@ -1,0 +1,13 @@
+### GET request to example server
+GET http://localhost:8080/api/users
+
+### POST cadastrando um usuário
+POST http://localhost:8080/api/users
+application/json
+
+{
+    "name": 'Lucia Rosa',
+    "email": 'lucia@use.com',
+    "password": '12345679'
+}
+
