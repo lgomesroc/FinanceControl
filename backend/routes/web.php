@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\CategoryController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IncomeController;
@@ -28,6 +29,9 @@ Route::resource('goals', GoalController::class);
 
 // Rotas para AlertController
 Route::resource('alerts', AlertController::class);
+
+Route::get('/caterory', [CategoryController::class, 'index']);
+Route::post('/caterory', [CategoryController::class, 'store']);
 
 // Rota para gerar o token CSRF
 Route::get('/generate-token', function () {
