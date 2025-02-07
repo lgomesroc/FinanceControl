@@ -23,6 +23,7 @@ class CategoryRequest extends FormRequest
     {
         return [
             'name' => 'required|string|unique:categories|max:50',
+            'type' => 'required|in:incomes,expenses',
             'description' => 'nullable',
         ];
     }

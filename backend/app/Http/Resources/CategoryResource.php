@@ -17,7 +17,8 @@ class CategoryResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'description' => ucwords($this->description)
+            'description' => ucwords($this->description),
+            'type' => $this->type
         ];
     }
 }
