@@ -13,4 +13,9 @@ class CategoryService
             'description' => $data['description']
         ]);
     }
+
+    public function delete(Category $category)
+    {
+        return $category->delete();
+    }
 }

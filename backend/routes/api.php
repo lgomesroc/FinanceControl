@@ -20,5 +20,6 @@ Route::get('/goals', [GoalController::class, 'index']);
 Route::post('/goals', [GoalController::class, 'store']);
 Route::get('/incomes', [IncomeController::class, 'index']);
 Route::post('/incomes', [IncomeController::class, 'store']);
-Route::get('/category', [CategoryController::class, 'index'])->name('api.category.index');
-Route::post('/category', [CategoryController::class, 'store'])->name('api.category.store');
+Route::get('/categories', [CategoryController::class, 'index'])->name('api.category.index');
+Route::post('/categories', [CategoryController::class, 'store'])->name('api.category.store');
+Route::delete('/categories/{category}', [CategoryController::class, 'destroy'])->name('api.category.destroy');

@@ -13,13 +13,10 @@
         @foreach($users as $user)
             <li>
                 <strong>{{ $user->name }}</strong> - {{ $user->email }}
-<<<<<<< HEAD
                 <a href="{{ url("users/$user->id/edit") }}" class="btn btn-warning">Editar</a>
                 <form action="{{ url("users/$user->id") }}" method="POST" style="display:inline;">
-=======
                 <a href="{{ url("/users/{$user->id}/edit") }}" class="btn btn-warning">Editar</a>
                 <form action="{{ url("/users/{$user->id}") }}" method="POST" style="display:inline;">
->>>>>>> origin/develop
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Excluir</button>

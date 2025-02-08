@@ -1,22 +1,27 @@
+
 @extends('layouts.app')
 
 @section('content')
-    <h1>Criar Rendimento</h1>
+    <h1>Criar Usuário</h1>
 
-    <form action="{{ route('incomes.store') }}" method="POST">
+    <form action="{{ route('users.store') }}" method="POST">
         @csrf
         <div>
-            <label for="name">Nome< do Rendimento/label>
+            <label for="name">Nome</label>
             <input type="text" name="name" id="name" required>
         </div>
         <div>
-            <label for="amount">Quantia</label>
-            <input type="number" name="amount" id="amount" required>
+            <label for="email">E-mail</label>
+            <input type="email" name="email" id="email" required>
         </div>
         <div>
-            <label for="date">Data</label>
-            <input type="date" name="date" id="date" required>
+            <label for="password">Senha</label>
+            <input type="password" name="password" id="password" required>
         </div>
-        <button type="submit">Criar Rendimento</button>
+        <div>
+            <label for="password_confirmation">Confirmação de Senha</label>
+            <input type="password" name="password_confirmation" id="password_confirmation" required>
+        </div>
+        <button type="submit">Criar Usuário</button>
     </form>
 @endsection
