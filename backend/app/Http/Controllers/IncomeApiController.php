@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 use App\Models\Income;
 use Throwable;
 
-class IncomeController extends Controller
+class IncomeApiController extends Controller
 {
     protected $incomeService;
 
@@ -35,7 +35,7 @@ class IncomeController extends Controller
     public function store(IncomeStoreRequest $request)
     {
         try {
-            $income = $this->incomeService . create($request->validated());
+            $income = $this->incomeService.create($request->validated());
             return redirect()->route('incomes.index')->with('success', 'Receita criada com sucesso!');
         } catch (Throwable $exception) {
             return redirect()->back()->with('error', $exception->getMessage());
@@ -57,7 +57,18 @@ class IncomeController extends Controller
     /** Atualiza os dados de uma receita específica **/
     public function update(IncomeUpdateRequest $request, Income $income)
     {
-        $this->incomeService . update($income, $request->validated());
+        $this->incomeService.update($income, $request->validated());
         return redirect()->route('incomes.index')->with('success', 'Receita atualizada com sucesso!');
+    }
+
+    /** Exclui uma receita específica */
+    public function destroy(Income $income)
+    {
+        try {
+            $this->incomeService.delete($income);
+            return redirect()->route('incomes.index')->with('success', 'Receita excluída com sucesso!');
+        } catch (Throwable $exception) {
+            return redirect()->back()->with('error', $exception->getMessage());
+        }
     }
 }

@@ -1,33 +1,54 @@
 <?php
 
-namespace App\Providers;
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ExpenseController;
 use App\Http\Controllers\GoalController;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\AuthController;
 
 // Rota inicial para teste
 Route::get('/', function () {
     return 'FinanceControl está funcionando!';
 });
 
-// Rotas para UserController
-Route::resource('users', UserController::class);
+// Rotas de autenticação
+Route::get('/login', function () {
+    return view('auth.login');
+})->name('login');
 
-// Rotas para IncomeController
-Route::resource('incomes', IncomeController::class);
+Route::post('/login', [AuthController::class, 'login'])->name('web.login');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rotas para ExpenseController
-Route::resource('expenses', ExpenseController::class);
+// Rotas para criar novo usuário (sem autenticação)
+Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
+Route::post('/users', [UserController::class, 'store'])->name('users.store');
 
-// Rotas para GoalController
-Route::resource('goals', GoalController::class);
+// Outras rotas protegidas
+Route::middleware('auth')->group(function () {
+    Route::get('/dashboard', function () {
+        return view('dashboard');
+    })->name('dashboard');
 
-// Rotas para AlertController
-Route::resource('alerts', AlertController::class);
+    // Rotas para UserController
+    Route::get('/users', [UserController::class, 'show'])->name('users.show');
+    Route::get('/users/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/users', [UserController::class, 'destroy'])->name('users.destroy');
+
+    // Rotas para IncomeController
+    Route::resource('incomes', IncomeController::class)->except(['index', 'show']);
+
+    // Rotas para ExpenseController
+    Route::resource('expenses', ExpenseController::class)->except(['index', 'show']);
+
+    // Rotas para GoalController
+    Route::resource('goals', GoalController::class)->except(['index', 'show']);
+
+    // Rotas para AlertController
+    Route::resource('alerts', AlertController::class)->except(['index', 'show']);
+});
 
 // Rota para gerar o token CSRF
 Route::get('/generate-token', function () {

@@ -6,19 +6,13 @@ use App\Models\Alert;
 use Illuminate\Http\Request;
 use Throwable;
 
-class AlertController extends Controller
+class AlertApiController extends Controller
 {
     /** Lista todos os alertas */
     public function index()
     {
         $alerts = Alert::all();
-        return view('alerts.index', compact('alerts'));
-    }
-
-    /** Exibe o formulário para criar um novo alerta */
-    public function create()
-    {
-        return view('alerts.create');
+        return response()->json($alerts);
     }
 
     /** Cria um novo alerta */
@@ -30,23 +24,17 @@ class AlertController extends Controller
         ]);
 
         try {
-            Alert::create($validated);
-            return redirect()->route('alerts.index')->with('success', 'Alerta criado com sucesso!');
+            $alert = Alert::create($validated);
+            return response()->json($alert, 201);
         } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
 
     /** Exibe os detalhes de um alerta específico **/
     public function show(Alert $alert)
     {
-        return view('alerts.show', compact('alert'));
-    }
-
-    /** Exibe o formulário para editar um alerta **/
-    public function edit(Alert $alert)
-    {
-        return view('alerts.edit', compact('alert'));
+        return response()->json($alert);
     }
 
     /** Atualiza os dados de um alerta específico **/
@@ -59,9 +47,9 @@ class AlertController extends Controller
 
         try {
             $alert->update($validated);
-            return redirect()->route('alerts.index')->with('success', 'Alerta atualizado com sucesso!');
+            return response()->json($alert);
         } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
 
@@ -70,9 +58,9 @@ class AlertController extends Controller
     {
         try {
             $alert->delete();
-            return redirect()->route('alerts.index')->with('success', 'Alerta excluído com sucesso!');
+            return response()->json(null, 204);
         } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
 }
