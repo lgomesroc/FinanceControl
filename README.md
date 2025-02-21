@@ -42,6 +42,7 @@ FinanceControl é um sistema de controle financeiro pessoal desenvolvido para aj
    docker exec -it laravel-app bash
    composer install
    ```
+   A porta é 8080.
 
 4. Configure o arquivo `.env`:
     - Copie o arquivo de exemplo:
@@ -60,10 +61,11 @@ FinanceControl é um sistema de controle financeiro pessoal desenvolvido para aj
    php artisan migrate
    ```
 
-7. Execute o comando abaixo lembrando que está na porta 8000
+7. Em outra janela do terminal, acesse o contêiner do mysql digitando o seguinte comando:
    ```bash
-   php artisan serve --host=0.0.0.0 --port=8000
+   mysql -u lgomesroc -p
    ```
+  O password é 12345
 
 ## Uso
 

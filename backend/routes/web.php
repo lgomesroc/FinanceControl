@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\IncomeController;
 use App\Http\Controllers\ExpenseController;
@@ -21,14 +22,16 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login'])->name('web.login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rotas para criar novo usuário (sem autenticação)
+// Rota para criar novo usuário (sem autenticação)
 Route::get('/users/create', [UserController::class, 'create'])->name('users.create');
 Route::post('/users', [UserController::class, 'store'])->name('users.store');
 
 // Outras rotas protegidas
 Route::middleware('auth')->group(function () {
+    // Rota do Dashboard
     Route::get('/dashboard', function () {
-        return view('dashboard');
+        $user = Auth::user();
+        return view('dashboard', compact('user'));
     })->name('dashboard');
 
     // Rotas para UserController

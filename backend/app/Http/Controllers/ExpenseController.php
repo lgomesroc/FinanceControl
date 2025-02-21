@@ -7,6 +7,7 @@ use App\Http\Requests\ExpenseUpdateRequest;
 use App\Services\ExpenseService;
 use Illuminate\Http\Request;
 use App\Models\Expense;
+use Illuminate\Support\Facades\Auth;
 use Throwable;
 
 class ExpenseController extends Controller
@@ -32,14 +33,16 @@ class ExpenseController extends Controller
     }
 
     /** Cria uma nova despesa */
-    public function store(ExpenseStoreRequest $request)
+    public function store(Request $request)
     {
-        try {
-            $expense = $this->expenseService.create($request->validated());
-            return redirect()->route('expenses.index')->with('success', 'Despesa criada com sucesso!');
-        } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
-        }
+        $expense = new Expense();
+        $expense->user_id = Auth::id();
+        $expense->description = $request->description;
+        $expense->amount = $request->amount;
+        $expense->date = $request->date;
+        $expense->save();
+
+        return redirect()->route('dashboard')->with('success', 'Despesa adicionada com sucesso!');
     }
 
     /** Exibe os detalhes de uma despesa específica **/

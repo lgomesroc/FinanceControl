@@ -8,6 +8,7 @@ use App\Services\IncomeService;
 use Illuminate\Http\Request;
 use App\Models\Income;
 use Throwable;
+use Illuminate\Support\Facades\Auth;
 
 class IncomeController extends Controller
 {
@@ -32,14 +33,16 @@ class IncomeController extends Controller
     }
 
     /** Cria uma nova receita */
-    public function store(IncomeStoreRequest $request)
+    public function store(Request $request)
     {
-        try {
-            $income = $this->incomeService . create($request->validated());
-            return redirect()->route('incomes.index')->with('success', 'Receita criada com sucesso!');
-        } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
-        }
+        $income = new Income();
+        $income->user_id = Auth::id();
+        $income->name = $request->name;
+        $income->amount = $request->amount;
+        $income->source = $request->source;
+        $income->save();
+
+        return redirect()->route('dashboard')->with('success', 'Receita adicionada com sucesso!');
     }
 
     /** Exibe os detalhes de uma receita específica **/
@@ -49,15 +52,29 @@ class IncomeController extends Controller
     }
 
     /** Exibe o formulário para editar uma receita **/
-    public function edit(Income $income)
+    public function edit($id)
     {
+        $income = Income::findOrFail($id);
         return view('incomes.edit', compact('income'));
     }
 
     /** Atualiza os dados de uma receita específica **/
-    public function update(IncomeUpdateRequest $request, Income $income)
+    public function update(Request $request, $id)
     {
-        $this->incomeService . update($income, $request->validated());
-        return redirect()->route('incomes.index')->with('success', 'Receita atualizada com sucesso!');
+        $income = Income::findOrFail($id);
+        $income->name = $request->name;
+        $income->amount = $request->amount;
+        $income->source = $request->source;
+        $income->save();
+
+        return redirect()->route('dashboard')->with('success', 'Receita atualizada com sucesso!');
+    }
+
+    public function destroy($id)
+    {
+        $income = Income::findOrFail($id);
+        $income->delete();
+
+        return redirect()->route('dashboard')->with('success', 'Receita deletada com sucesso!');
     }
 }

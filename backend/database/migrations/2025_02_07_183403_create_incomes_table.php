@@ -11,6 +11,7 @@ class CreateIncomesTable extends Migration
         Schema::create('incomes', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users');
+            $table->string('name');
             $table->decimal('amount', 10, 2);
             $table->string('source');
             $table->timestamps();

@@ -21,7 +21,7 @@ class GoalController extends Controller
     /** Lista todas as metas */
     public function index()
     {
-        $goals = Goal::select('id', 'title', 'description', 'target_amount', 'deadline')->get();
+        $goals = Goal::select('id', 'title', 'description', 'target_amount', 'current_amount', 'due_date')->get();
         return view('goals.index', compact('goals'));
     }
 
@@ -34,11 +34,36 @@ class GoalController extends Controller
     /** Cria uma nova meta */
     public function store(GoalStoreRequest $request)
     {
-        try {
-            $goal = $this->goalService.create($request->validated());
-            return redirect()->route('goals.index')->with('success', 'Meta criada com sucesso!');
-        } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+        {
+            try {
+                // Definir regras de validação
+                $rules = [
+                    'name' => 'required|string|max:255',
+                    'amount' => 'required|numeric',
+                    'deadline' => 'required|date',
+                ];
+
+                // Validar a solicitação
+                $validated = $request->validate($rules);
+
+                // Criar a meta
+                $goal = Goal::create($validated);
+
+                // API: retorna a meta criada
+                if ($request->is('api/goals')) {
+                    return response()->json([
+                        'goal' => $goal,
+                        'message' => 'Meta criada com sucesso!'],
+                        201);
+                }
+
+                // Web: redireciona para a lista de metas
+                return redirect()->route('goals.index')->with('success', 'Meta criada com sucesso!');
+
+            } catch (Throwable $exception) {
+                return response()->json(['error' => $exception->getMessage()], 500);
+
+            }
         }
     }
 

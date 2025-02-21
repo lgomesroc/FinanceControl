@@ -12,4 +12,25 @@ class Goal extends Model
     protected $fillable = [
         'title', 'description', 'target_amount', 'current_amount', 'due_date', 'user_id',
     ];
+
+    public function incomes()
+    {
+        return $this->hasMany(Income::class);
+    }
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    public function goals()
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    public function alerts()
+    {
+        return $this->hasMany(Alert::class);
+    }
+
 }

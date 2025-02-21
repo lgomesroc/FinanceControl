@@ -19,6 +19,7 @@
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
             <button type="submit" class="btn btn-primary">Criar</button>
+            <a href="{{ route('users.store') }}" class="btn btn-secondary">Voltar</a>
         </form>
     </div>
 @endsection
