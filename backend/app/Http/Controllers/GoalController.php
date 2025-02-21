@@ -4,96 +4,100 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\GoalStoreRequest;
 use App\Http\Requests\GoalUpdateRequest;
-use App\Services\GoalService;
-use Illuminate\Http\Request;
 use App\Models\Goal;
+use Illuminate\Http\Request;
 use Throwable;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
+
 
 class GoalController extends Controller
 {
-    protected $goalService;
-
-    public function __construct(GoalService $goalService)
-    {
-        $this->goalService = $goalService;
-    }
-
-    /** Lista todas as metas */
+    use AuthorizesRequests;
     public function index()
     {
-        $goals = Goal::select('id', 'title', 'description', 'target_amount', 'current_amount', 'due_date')->get();
+        $goals = Goal::where('user_id', auth()->id())->get();
         return view('goals.index', compact('goals'));
     }
 
-    /** Exibe o formulário para criar uma nova meta */
     public function create()
     {
         return view('goals.create');
     }
 
-    /** Cria uma nova meta */
-    public function store(GoalStoreRequest $request)
+    public function store(Request $request)
     {
-        {
-            try {
-                // Definir regras de validação
-                $rules = [
-                    'name' => 'required|string|max:255',
-                    'amount' => 'required|numeric',
-                    'deadline' => 'required|date',
-                ];
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'target_amount' => 'required|numeric|min:0',
+                'due_date' => 'required|date|after:today',
+            ]);
 
-                // Validar a solicitação
-                $validated = $request->validate($rules);
+            $validated['user_id'] = auth()->id();
+            $validated['current_amount'] = 0;
 
-                // Criar a meta
-                $goal = Goal::create($validated);
+            $goal = Goal::create($validated);
 
-                // API: retorna a meta criada
-                if ($request->is('api/goals')) {
-                    return response()->json([
-                        'goal' => $goal,
-                        'message' => 'Meta criada com sucesso!'],
-                        201);
-                }
+            return redirect()->route('goals.index')
+                ->with('success', 'Meta criada com sucesso!');
 
-                // Web: redireciona para a lista de metas
-                return redirect()->route('goals.index')->with('success', 'Meta criada com sucesso!');
-
-            } catch (Throwable $exception) {
-                return response()->json(['error' => $exception->getMessage()], 500);
-
-            }
+        } catch (Throwable $exception) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao criar meta: ' . $exception->getMessage());
         }
     }
 
-    /** Exibe os detalhes de uma meta específica **/
     public function show(Goal $goal)
     {
+        $this->authorize('view', $goal);
         return view('goals.show', compact('goal'));
     }
 
-    /** Exibe o formulário para editar uma meta **/
     public function edit(Goal $goal)
     {
+        $this->authorize('update', $goal);
         return view('goals.edit', compact('goal'));
     }
 
-    /** Atualiza os dados de uma meta específica **/
-    public function update(GoalUpdateRequest $request, Goal $goal)
+    public function update(Request $request, Goal $goal)
     {
-        $this->goalService.update($goal, $request->validated());
-        return redirect()->route('goals.index')->with('success', 'Meta atualizada com sucesso!');
+        try {
+            $this->authorize('update', $goal);
+
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'target_amount' => 'required|numeric|min:0',
+                'current_amount' => 'required|numeric|min:0',
+                'due_date' => 'required|date',
+            ]);
+
+            $goal->update($validated);
+
+            return redirect()->route('goals.index')
+                ->with('success', 'Meta atualizada com sucesso!');
+
+        } catch (Throwable $exception) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar meta: ' . $exception->getMessage());
+        }
     }
 
-    /** Exclui uma meta específica */
     public function destroy(Goal $goal)
     {
         try {
-            $this->goalService.delete($goal);
-            return redirect()->route('goals.index')->with('success', 'Meta excluída com sucesso!');
+            $this->authorize('delete', $goal);
+
+            $goal->delete();
+
+            return redirect()->route('goals.index')
+                ->with('success', 'Meta excluída com sucesso!');
+
         } catch (Throwable $exception) {
-            return redirect()->back()->with('error', $exception->getMessage());
+            return back()->with('error', 'Erro ao excluir meta: ' . $exception->getMessage());
         }
     }
 }

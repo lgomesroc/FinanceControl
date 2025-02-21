@@ -7,6 +7,7 @@
         <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
+    <a href="{{ route('dashboard') }}" class="btn btn-secondary">Voltar ao Dashboard</a>
     <a href="{{ route('goals.create') }}" class="btn btn-primary">Adicionar Meta</a>
 
     <ul>

@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('expenses', ExpenseController::class)->except(['index', 'show']);
 
     // Rotas para GoalController
-    Route::resource('goals', GoalController::class)->except(['index', 'show']);
+    Route::resource('goals', GoalController::class);
 
     // Rotas para AlertController
     Route::resource('alerts', AlertController::class)->except(['index', 'show']);
