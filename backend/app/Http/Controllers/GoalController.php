@@ -57,6 +57,7 @@ class GoalController extends Controller
 
     public function edit(Goal $goal)
     {
+        
         $this->authorize('update', $goal);
         return view('goals.edit', compact('goal'));
     }
