@@ -8,13 +8,17 @@
             <div class="alert alert-success">{{ session('success') }}</div>
         @endif
 
+        @if(session('error'))
+            <div class="alert alert-danger">{{ session('error') }}</div>
+        @endif
+
         <p>Você está autenticado!</p>
+
         <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Editar Perfil</a>
         <a href="{{ route('incomes.create') }}" class="btn btn-secondary">Adicionar Renda</a>
         <a href="{{ route('expenses.create') }}" class="btn btn-secondary">Adicionar Despesa</a>
         <a href="{{ route('goals.create') }}" class="btn btn-secondary">Adicionar Meta</a>
         <a href="{{ route('alerts.create') }}" class="btn btn-secondary">Adicionar Alerta</a>
-
 
         <!-- Listagem de Receitas -->
         <h2>Suas Receitas</h2>
@@ -146,4 +150,7 @@
         <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;" onsubmit="return confirm('Tem certeza que deseja excluir sua conta permanentemente? Esta ação não pode ser desfeita.');">
             @csrf
             @method('DELETE')
-            <button type="
+            <button type="submit" class="btn btn-danger">Excluir Conta</button>
+        </form>
+    </div>
+@endsection

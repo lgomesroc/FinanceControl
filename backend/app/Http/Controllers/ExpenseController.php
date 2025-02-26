@@ -68,7 +68,7 @@ class ExpenseController extends Controller
     public function destroy(Expense $expense)
     {
         try {
-            $this->expenseService.delete($expense);
+            $this->expenseService->delete($expense);
             return redirect()->route('expenses.index')->with('success', 'Despesa excluída com sucesso!');
         } catch (Throwable $exception) {
             return redirect()->back()->with('error', $exception->getMessage());

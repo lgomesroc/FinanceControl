@@ -10,9 +10,10 @@
             <input type="text" name="message" id="message" required>
         </div>
         <div>
-            <label for="user_id">ID do Usuário</label>
-            <input type="text" name="user_id" id="user_id" required>
+            <label for="type">Tipo</label>
+            <input type="text" name="type" id="type" required>
         </div>
-        <button type="submit">Criar Alerta</button>
+        <button type="submit" class="btn btn-primary">Criar Alerta</button>
+        <a href="{{ route('dashboard') }}" class="btn btn-secondary">Voltar para o Dashboard</a>
     </form>
 @endsection

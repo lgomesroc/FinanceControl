@@ -9,21 +9,24 @@ use Illuminate\Http\Request;
 use Throwable;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-
 class GoalController extends Controller
 {
     use AuthorizesRequests;
+
+    /** Lista todas as metas do usuário */
     public function index()
     {
         $goals = Goal::where('user_id', auth()->id())->get();
         return view('goals.index', compact('goals'));
     }
 
+    /** Exibe o formulário para criar uma nova meta */
     public function create()
     {
         return view('goals.create');
     }
 
+    /** Cria uma nova meta */
     public function store(Request $request)
     {
         try {
@@ -39,7 +42,7 @@ class GoalController extends Controller
 
             $goal = Goal::create($validated);
 
-            return redirect()->route('goals.index')
+            return redirect()->route('dashboard')
                 ->with('success', 'Meta criada com sucesso!');
 
         } catch (Throwable $exception) {
@@ -49,19 +52,21 @@ class GoalController extends Controller
         }
     }
 
+    /** Exibe os detalhes de uma meta específica */
     public function show(Goal $goal)
     {
         $this->authorize('view', $goal);
         return view('goals.show', compact('goal'));
     }
 
+    /** Exibe o formulário para editar uma meta */
     public function edit(Goal $goal)
     {
-        
         $this->authorize('update', $goal);
         return view('goals.edit', compact('goal'));
     }
 
+    /** Atualiza os dados de uma meta específica */
     public function update(Request $request, Goal $goal)
     {
         try {
@@ -77,7 +82,7 @@ class GoalController extends Controller
 
             $goal->update($validated);
 
-            return redirect()->route('goals.index')
+            return redirect()->route('dashboard')
                 ->with('success', 'Meta atualizada com sucesso!');
 
         } catch (Throwable $exception) {
@@ -87,6 +92,7 @@ class GoalController extends Controller
         }
     }
 
+    /** Exclui uma meta específica */
     public function destroy(Goal $goal)
     {
         try {
@@ -94,11 +100,11 @@ class GoalController extends Controller
 
             $goal->delete();
 
-            return redirect()->route('goals.index')
+            return redirect()->route('dashboard')
                 ->with('success', 'Meta excluída com sucesso!');
 
         } catch (Throwable $exception) {
-            return back()->with('error', 'Erro ao excluir meta: ' . $exception->getMessage());
+            return redirect()->back()->with('error', 'Erro ao excluir meta: ' . $exception->getMessage());
         }
     }
 }

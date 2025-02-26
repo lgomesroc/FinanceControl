@@ -2,32 +2,27 @@
 
 namespace App\Providers;
 
-use App\Models\Goal;
-use App\Policies\GoalPolicy;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Goal;
+use App\Policies\GoalPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * O mapeamento das políticas do aplicativo.
+     * The model to policy mappings for the application.
      *
-     * @var array
+     * @var array<class-string, class-string>
      */
     protected $policies = [
-        Goal::class => GoalPolicy::class, // Registra a política para o modelo Goal
+        Goal::class => GoalPolicy::class,
     ];
 
     /**
-     * Registre quaisquer serviços de autenticação/autorização.
+     * Register any authentication / authorization services.
      */
     public function boot(): void
     {
         $this->registerPolicies();
-
-        // Exemplo de Gate global, caso precise
-        // Gate::define('update-goal', function ($user, $goal) {
-        //     return $user->id === $goal->user_id;
-        // });
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Alert;
 use Illuminate\Http\Request;
 use Throwable;
+use Illuminate\Support\Facades\Auth;
 
 class AlertController extends Controller
 {
@@ -30,7 +31,11 @@ class AlertController extends Controller
         ]);
 
         try {
-            Alert::create($validated);
+            Alert::create([
+                'message' => $validated['message'],
+                'type' => $validated['type'],
+                'user_id' => Auth::id(),
+            ]);
             return redirect()->route('alerts.index')->with('success', 'Alerta criado com sucesso!');
         } catch (Throwable $exception) {
             return redirect()->back()->with('error', $exception->getMessage());

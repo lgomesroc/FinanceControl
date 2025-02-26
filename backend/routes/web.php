@@ -50,7 +50,8 @@ Route::middleware('auth')->group(function () {
     Route::resource('goals', GoalController::class);
 
     // Rotas para AlertController
-    Route::resource('alerts', AlertController::class)->except(['index', 'show']);
+    Route::resource('alerts', AlertController::class);
+
 });
 
 // Rota para gerar o token CSRF

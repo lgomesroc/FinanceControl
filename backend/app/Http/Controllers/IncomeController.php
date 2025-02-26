@@ -61,20 +61,29 @@ class IncomeController extends Controller
     /** Atualiza os dados de uma receita específica **/
     public function update(Request $request, $id)
     {
-        $income = Income::findOrFail($id);
-        $income->name = $request->name;
-        $income->amount = $request->amount;
-        $income->source = $request->source;
-        $income->save();
+        try {
+            $income = Income::findOrFail($id);
+            $income->name = $request->name;
+            $income->amount = $request->amount;
+            $income->source = $request->source;
+            $income->save();
 
-        return redirect()->route('dashboard')->with('success', 'Receita atualizada com sucesso!');
+            return redirect()->route('dashboard')->with('success', 'Receita atualizada com sucesso!');
+        } catch (Throwable $exception) {
+            return redirect()->back()->with('error', 'Erro ao atualizar receita: ' . $exception->getMessage());
+        }
     }
 
+    /** Exclui uma receita específica */
     public function destroy($id)
     {
-        $income = Income::findOrFail($id);
-        $income->delete();
+        try {
+            $income = Income::findOrFail($id);
+            $income->delete();
 
-        return redirect()->route('dashboard')->with('success', 'Receita deletada com sucesso!');
+            return redirect()->route('dashboard')->with('success', 'Receita excluída com sucesso!');
+        } catch (Throwable $exception) {
+            return redirect()->back()->with('error', 'Erro ao excluir receita: ' . $exception->getMessage());
+        }
     }
 }
