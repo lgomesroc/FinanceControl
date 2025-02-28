@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\GoalStoreRequest;
 use App\Http\Requests\GoalUpdateRequest;
 use App\Models\Goal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Throwable;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -23,7 +24,8 @@ class GoalController extends Controller
     /** Exibe o formulário para criar uma nova meta */
     public function create()
     {
-        return view('goals.create');
+        $dateNow = Carbon::now()->addDay()->toDateString();
+        return view('goals.create', ['dateNow' => $dateNow]);
     }
 
     /** Cria uma nova meta */
@@ -62,8 +64,10 @@ class GoalController extends Controller
     /** Exibe o formulário para editar uma meta */
     public function edit(Goal $goal)
     {
+        $dateNow = Carbon::now()->addDay()->toDateString();
+        $due_date = Carbon::parse($goal->due_date)->toDateString();
         $this->authorize('update', $goal);
-        return view('goals.edit', compact('goal'));
+        return view('goals.edit', ['goal' => $goal, 'dateNow' => $dateNow, 'due_date' => $due_date]);
     }
 
     /** Atualiza os dados de uma meta específica */
@@ -76,7 +80,6 @@ class GoalController extends Controller
                 'title' => 'required|string|max:255',
                 'description' => 'required|string',
                 'target_amount' => 'required|numeric|min:0',
-                'current_amount' => 'required|numeric|min:0',
                 'due_date' => 'required|date',
             ]);
 
