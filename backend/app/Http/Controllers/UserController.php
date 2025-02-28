@@ -20,6 +20,13 @@ class UserController extends Controller
         $this->userService = $userService;
     }
 
+    public function index()
+    {
+        $users = User::with('incomes')->with('expenses')
+            ->with('goals')->with('alerts')->get();
+        return view('dashboard', ['users'=>$users]);
+    }
+
     /** Exibe o formulário para criar um novo usuário **/
     public function create()
     {
