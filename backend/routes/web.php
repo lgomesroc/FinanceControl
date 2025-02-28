@@ -29,10 +29,7 @@ Route::post('/users', [UserController::class, 'store'])->name('users.store');
 // Outras rotas protegidas
 Route::middleware('auth')->group(function () {
     // Rota do Dashboard
-    Route::get('/dashboard', function () {
-        $user = Auth::user();
-        return view('dashboard', compact('user'));
-    })->name('dashboard');
+    Route::get('/dashboard', [UserController::class, 'index'])->name('dashboard');
 
     // Rotas para UserController
     Route::get('/users', [UserController::class, 'show'])->name('users.show');
