@@ -10,7 +10,7 @@ class Alert extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'message', 'user_id', 'date',
+        'title', 'message', 'user_id', 'date','type'
     ];
 
     public function incomes()
