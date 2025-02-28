@@ -36,7 +36,7 @@ class AlertController extends Controller
                 'type' => $validated['type'],
                 'user_id' => Auth::id(),
             ]);
-            return redirect()->route('alerts.index')->with('success', 'Alerta criado com sucesso!');
+            return redirect()->route('dashboard')->with('success', 'Alerta criado com sucesso!');
         } catch (Throwable $exception) {
             return redirect()->back()->with('error', $exception->getMessage());
         }
