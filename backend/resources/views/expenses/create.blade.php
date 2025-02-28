@@ -15,6 +15,10 @@
                 <input type="number" step="0.01" class="form-control" id="amount" name="amount" required>
             </div>
             <div class="form-group">
+                <label for="amount">Categoria</label>
+                <input type="text" class="form-control" id="category" name="category" required>
+            </div>
+            <div class="form-group">
                 <label for="date">Data</label>
                 <input type="date" class="form-control" id="date" name="date" required>
             </div>
