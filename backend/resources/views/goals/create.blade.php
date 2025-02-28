@@ -19,7 +19,7 @@
         </div>
         <div>
             <label for="due_date">Data Limite</label>
-            <input type="date" name="due_date" id="due_date" required>
+            <input type="date" name="due_date" id="due_date"  min="{{$dateNow }}" required>
         </div>
         <button type="submit">Criar Meta</button>
     </form>
