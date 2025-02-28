@@ -1,44 +1,30 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="container">
-        <h1>Usuários</h1>
+    <h1>Usuários</h1>
 
-        @if(session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
-        @endif
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-        <a href="{{ route('users.create') }}" class="btn btn-primary">Criar Usuário</a>
+    <a href="{{ route('users.create') }}" class="btn btn-primary">Criar Usuário</a>
 
-        <table class="table mt-3">
-            <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Email</th>
-                <th>Ações</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach($users as $user)
-                <tr>
-                    <td>{{ $user->id }}</td>
-                    <td>{{ $user->name }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>
-                        <a href="{{ route('users.show', $user->id) }}" class="btn btn-info">Ver</a>
-                        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-warning">Editar</a>
-                        <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn btn-danger">Excluir</button>
-                        </form>
-                    </td>
-                </tr>
-            @endforeach
-            </tbody>
-        </table>
-
-        <a href="{{ route('dashboard') }}" class="btn btn-secondary mt-3">Voltar para o Dashboard</a>
-    </div>
+    <ul>
+        @foreach($users as $user)
+            <li>
+                <strong>{{ $user->name }}</strong> - {{ $user->email }}
+<<<<<<< HEAD
+                <a href="{{ url("users/$user->id/edit") }}" class="btn btn-warning">Editar</a>
+                <form action="{{ url("users/$user->id") }}" method="POST" style="display:inline;">
+=======
+                <a href="{{ url("/users/{$user->id}/edit") }}" class="btn btn-warning">Editar</a>
+                <form action="{{ url("/users/{$user->id}") }}" method="POST" style="display:inline;">
+>>>>>>> origin/develop
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </form>
+            </li>
+        @endforeach
+    </ul>
 @endsection
