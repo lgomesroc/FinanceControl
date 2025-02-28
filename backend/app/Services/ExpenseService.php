@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Expense;
+use Illuminate\Support\Facades\Log;
 
 class ExpenseService
 {
@@ -10,6 +11,7 @@ class ExpenseService
     public function create(array $data)
     {
         return Expense::create([
+            'category' => $data['category'],
             'description' => $data['description'],
             'amount' => $data['amount'],
             'date' => $data['date'],
@@ -17,12 +19,14 @@ class ExpenseService
     }
 
     /** Atualiza a despesa */
-    public function update(Expense $expense, array $data)
+    public function update(int $id, array $data)
     {
+        $expense = Expense::find($id);
         $expense->update([
             'description' => $data['description'],
             'amount' => $data['amount'],
-            'date' => $data['date'],
+            'category' => $data['category'],
+            'date' => $data['date']
         ]);
 
         return $expense;

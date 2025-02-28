@@ -23,8 +23,9 @@ class ExpenseUpdateRequest extends FormRequest
     {
         return [
             'description' => 'required|string|max:255',
+            'category' => 'required|string|max:255',
             'amount' => 'required|numeric|min:0',
-            'date' => 'required|date',
+            'date' => 'required',
         ];
     }
 }

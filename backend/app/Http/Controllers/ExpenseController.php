@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Http\Requests\ExpenseStoreRequest;
 use App\Http\Requests\ExpenseUpdateRequest;
 use App\Services\ExpenseService;
+use Exception;
 use Illuminate\Http\Request;
 use App\Models\Expense;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Throwable;
 
 class ExpenseController extends Controller
@@ -37,6 +39,7 @@ class ExpenseController extends Controller
     {
         $expense = new Expense();
         $expense->user_id = Auth::id();
+        $expense->category = $request->category ;
         $expense->description = $request->description;
         $expense->amount = $request->amount;
         $expense->date = $request->date;
@@ -60,8 +63,13 @@ class ExpenseController extends Controller
     /** Atualiza os dados de uma despesa específica **/
     public function update(ExpenseUpdateRequest $request, Expense $expense)
     {
-        $this->expenseService.update($expense, $request->validated());
-        return redirect()->route('expenses.index')->with('success', 'Despesa atualizada com sucesso!');
+        try {
+            $this->expenseService->update($expense->id, $request->validated());
+            return redirect()->route('dashboard')->with('success', 'Despesa atualizada com sucesso!');
+        } catch (Exception $exception) {
+            Log::info($exception);
+            return redirect()->back()->withErrors(['error' => $exception->getMessage()]);
+        }
     }
 
     /** Exclui uma despesa específica */
