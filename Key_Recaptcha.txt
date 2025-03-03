@@ -1,0 +1,3 @@
+Use esta chave de site no código HTML que seu site exibe aos usuários: 6LfyyeMqAAAAAGyrdZq7mVOhBwtANUH6wKlj3tWR
+
+Use esta chave secreta para comunicação entre seu site e o reCAPTCHA.: 6LfyyeMqAAAAAERtH_kjggWojXMymsWjY0FS0YM8

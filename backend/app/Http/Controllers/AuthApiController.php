@@ -4,39 +4,39 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 
 class AuthApiController extends Controller
 {
-    /**
-     * Handle login request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function login(Request $request)
     {
-        $credentials = $request->only('email', 'password');
+        // Verificar o reCAPTCHA
+        $recaptchaResponse = $request->input('recaptcha');
+        $recaptchaSecret = env('RECAPTCHA_SECRET_KEY');
+        $recaptcha = Http::asForm()->post('https://www.google.com/recaptcha/api/siteverify', [
+            'secret' => $recaptchaSecret,
+            'response' => $recaptchaResponse,
+        ]);
 
-        if (!Auth::attempt($credentials)) {
-            return response()->json(['message' => 'Invalid login credentials'], 401);
+        if (!$recaptcha->json('success')) {
+            return response()->json(['message' => 'Falha no reCAPTCHA.'], 422);
         }
 
-        $user = Auth::user();
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // Autenticar o usuário
+        $credentials = $request->only('email', 'password');
+        if (Auth::attempt($credentials)) {
+            $request->session()->regenerate();
+            return response()->json(['user' => Auth::user()]);
+        }
 
-        return response()->json(['access_token' => $token, 'token_type' => 'Bearer']);
+        return response()->json(['message' => 'Credenciais inválidas.'], 401);
     }
 
-    /**
-     * Handle logout request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\JsonResponse
-     */
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-
-        return response()->json(['message' => 'Logged out successfully']);
+        Auth::logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return response()->json(['message' => 'Logout realizado com sucesso.']);
     }
 }

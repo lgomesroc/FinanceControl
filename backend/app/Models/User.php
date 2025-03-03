@@ -2,14 +2,48 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Foundation\Auth\User as AuthenticatableBase;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
-class User extends Model
+class User extends AuthenticatableBase implements AuthenticatableContract
 {
-    use HasApiTokens;
+    use Authenticatable;
 
-    protected $fillable = ['name', 'email', 'password'];
+    protected $fillable = [
+        'name', 'email', 'password',
+    ];
 
-    public $timestamps = true;
+    protected $hidden = [
+        'password', 'remember_token',
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+    ];
+
+    // Definir a relação com Income
+    public function incomes(): HasMany
+    {
+        return $this->hasMany(Income::class);
+    }
+
+    // Definir a relação com Expense
+    public function expenses(): HasMany
+    {
+        return $this->hasMany(Expense::class);
+    }
+
+    // Definir a relação com Goal
+    public function goals(): HasMany
+    {
+        return $this->hasMany(Goal::class);
+    }
+
+    // Definir a relação com Alert
+    public function alerts(): HasMany
+    {
+        return $this->hasMany(Alert::class);
+    }
 }
