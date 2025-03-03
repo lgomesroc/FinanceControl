@@ -1,11 +1,15 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Detalhes do Usuário</h1>
-
-    <p><strong>Nome:</strong> {{ $user->name }}</p>
-    <p><strong>E-mail:</strong> {{ $user->email }}</p>
-    <p><strong>Criado em:</strong> {{ $user->created_at }}</p>
-
-    <a href="{{ route('users.index') }}" class="btn btn-secondary">Voltar</a>
+    <div class="container">
+        <h1>Perfil do Usuário</h1>
+        <p><strong>Nome:</strong> {{ $user->name }}</p>
+        <p><strong>Email:</strong> {{ $user->email }}</p>
+        <a href="{{ route('users.edit', $user->id) }}" class="btn btn-primary">Editar Perfil</a>
+        <form action="{{ route('users.destroy', $user->id) }}" method="POST" style="display:inline;">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-danger">Excluir Conta</button>
+        </form>
+    </div>
 @endsection

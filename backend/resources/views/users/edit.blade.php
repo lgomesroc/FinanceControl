@@ -24,4 +24,6 @@
         </div>
         <button type="submit">Atualizar Usuário</button>
     </form>
+
+    <a href="{{ route('dashboard') }}" class="btn btn-secondary">Voltar ao Dashboard</a>
 @endsection

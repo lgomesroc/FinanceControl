@@ -1,19 +1,22 @@
 @extends('layouts.app')
 
 @section('content')
-    <h1>Editar Alerta</h1>
+    <div class="container">
+        <h1>Editar Alerta</h1>
 
-    <form action="{{ route('alerts.update', $alert) }}" method="POST">
-        @csrf
-        @method('PUT')
-        <div>
-            <label for="message">Mensagem</label>
-            <input type="text" name="message" id="message" value="{{ old('message', $alert->message) }}" required>
-        </div>
-        <div>
-            <label for="user_id">ID do Usuário</label>
-            <input type="text" name="user_id" id="user_id" value="{{ old('user_id', $alert->user_id) }}" required>
-        </div>
-        <button type="submit">Atualizar Alerta</button>
-    </form>
+        <form method="POST" action="{{ route('alerts.update', $alert->id) }}">
+            @csrf
+            @method('PUT')
+            <div class="form-group">
+                <label for="name">Nome do Alerta</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{ $alert->message }}" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Descrição</label>
+                <input type="text" class="form-control" id="description" name="description" value="{{ $alert->type }}" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Atualizar</button>
+            <a href="{{ route('dashboard') }}" class="btn btn-secondary">Voltar ao Dashboard</a>
+        </form>
+    </div>
 @endsection

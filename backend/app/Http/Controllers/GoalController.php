@@ -2,96 +2,112 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\GoalStoreRequest;
+use App\Http\Requests\GoalUpdateRequest;
 use App\Models\Goal;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Throwable;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class GoalController extends Controller
 {
-    // Lista todas as metas
+    use AuthorizesRequests;
+
+    /** Lista todas as metas do usuário */
     public function index()
     {
-        $goals = Goal::all();
-
-        // API: retorna JSON
-        if (request()->wantsJson()) {
-            return response()->json($goals);
-        }
-
-        // Web: retorna view
+        $goals = Goal::where('user_id', auth()->id())->get();
         return view('goals.index', compact('goals'));
     }
 
-    // Exibe o formulário para criar uma nova meta
+    /** Exibe o formulário para criar uma nova meta */
     public function create()
     {
-        return view('goals.create');
+        $dateNow = Carbon::now()->addDay()->toDateString();
+        return view('goals.create', ['dateNow' => $dateNow]);
     }
 
-    // Salva uma nova meta
+    /** Cria uma nova meta */
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'target_amount' => 'required|numeric|min:0',
-            'deadline' => 'nullable|date',
-        ]);
+        try {
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'target_amount' => 'required|numeric|min:0',
+                'due_date' => 'required|date|after:today',
+            ]);
 
-        $goal = Goal::create($validated);
+            $validated['user_id'] = auth()->id();
+            $validated['current_amount'] = 0;
 
-        // API: retorna a meta criada
-        if ($request->wantsJson()) {
-            return response()->json($goal, 201);
+            $goal = Goal::create($validated);
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Meta criada com sucesso!');
+
+        } catch (Throwable $exception) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao criar meta: ' . $exception->getMessage());
         }
-
-        // Web: redireciona para a lista de metas
-        return redirect()->route('goals.index')->with('success', 'Meta criada com sucesso!');
     }
 
-    // Exibe os detalhes de uma meta específica
+    /** Exibe os detalhes de uma meta específica */
     public function show(Goal $goal)
     {
+        $this->authorize('view', $goal);
         return view('goals.show', compact('goal'));
     }
 
-    // Exibe o formulário para editar uma meta
+    /** Exibe o formulário para editar uma meta */
     public function edit(Goal $goal)
     {
-        return view('goals.edit', compact('goal'));
+        $dateNow = Carbon::now()->addDay()->toDateString();
+        $due_date = Carbon::parse($goal->due_date)->toDateString();
+        $this->authorize('update', $goal);
+        return view('goals.edit', ['goal' => $goal, 'dateNow' => $dateNow, 'due_date' => $due_date]);
     }
 
-    // Atualiza os dados de uma meta específica
+    /** Atualiza os dados de uma meta específica */
     public function update(Request $request, Goal $goal)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'description' => 'nullable|string|max:500',
-            'target_amount' => 'required|numeric|min:0',
-            'deadline' => 'nullable|date',
-        ]);
+        try {
+            $this->authorize('update', $goal);
 
-        $goal->update($validated);
+            $validated = $request->validate([
+                'title' => 'required|string|max:255',
+                'description' => 'required|string',
+                'target_amount' => 'required|numeric|min:0',
+                'due_date' => 'required|date',
+            ]);
 
-        // API: retorna a meta atualizada
-        if ($request->wantsJson()) {
-            return response()->json($goal);
+            $goal->update($validated);
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Meta atualizada com sucesso!');
+
+        } catch (Throwable $exception) {
+            return back()
+                ->withInput()
+                ->with('error', 'Erro ao atualizar meta: ' . $exception->getMessage());
         }
-
-        // Web: redireciona para a lista de metas
-        return redirect()->route('goals.index')->with('success', 'Meta atualizada com sucesso!');
     }
 
-    // Exclui uma meta específica
+    /** Exclui uma meta específica */
     public function destroy(Goal $goal)
     {
-        $goal->delete();
+        try {
+            $this->authorize('delete', $goal);
 
-        // API: retorna status de sucesso
-        if (request()->wantsJson()) {
-            return response()->json(null, 204);
+            $goal->delete();
+
+            return redirect()->route('dashboard')
+                ->with('success', 'Meta excluída com sucesso!');
+
+        } catch (Throwable $exception) {
+            return redirect()->back()->with('error', 'Erro ao excluir meta: ' . $exception->getMessage());
         }
-
-        // Web: redireciona para a lista de metas
-        return redirect()->route('goals.index')->with('success', 'Meta excluída com sucesso!');
     }
 }

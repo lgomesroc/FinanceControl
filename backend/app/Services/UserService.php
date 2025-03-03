@@ -3,36 +3,35 @@
 namespace App\Services;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    /** serviço para salvar um usuário */
+    /** Serviço para criar um novo usuário **/
     public function create(array $data)
     {
         return User::create([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => bcrypt($data['password']),
+            'password' => Hash::make($data['password']),
         ]);
     }
 
-    /** atualiza o usuário */
+    /** Serviço para atualizar um usuário **/
     public function update(User $user, array $data)
     {
         $user->update([
             'name' => $data['name'],
             'email' => $data['email'],
-            'password' => $data['password'] ? bcrypt($data['password']) : $user->password,
+            'password' => Hash::make($data['password']),
         ]);
 
         return $user;
     }
 
-    /** deleta um usuário */
+    /** Serviço para excluir um usuário **/
     public function delete(User $user)
     {
         return $user->delete();
     }
 }
-
-
